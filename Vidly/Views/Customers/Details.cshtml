@@ -1,0 +1,12 @@
+﻿@model Vidly.Models.Customer
+@{
+    ViewBag.Title = Model.Name;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    var display = Model == null ? "No Customer with this ID" : Model.Name;
+ }
+
+<h2>@display</h2>
+
