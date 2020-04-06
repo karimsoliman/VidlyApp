@@ -10,3 +10,13 @@
 
 <h2>@display</h2>
 
+<ul>
+    <li>Membership Type: @Model.MemberShipType.Name</li>
+    @{
+        if (Model.Birthdate != null)
+        {
+            <li>Birthdate: @Model.Birthdate.Value.ToShortDateString()</li>
+        }
+    }
+</ul>
+
