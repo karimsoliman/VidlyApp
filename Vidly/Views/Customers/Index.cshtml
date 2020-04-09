@@ -6,31 +6,90 @@
 
 <h2>Customers</h2>
 
-@{
-    if (Model.Customers.Count == 0)
+<table id="Customers" class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Customer</th>
+            <th>Membership Type</th>
+            <th>Discount Rate</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+@*@foreach (var customer in Model.Customers)
     {
-        <h2>There is no Customers yet.</h2>
-    }
-    else
-    {
-        <table class="table table-bordered table-hover">
-            <thead>
-                <tr>
-                    <th>Customer</th>
-                    <th>Membership Type</th>
-                    <th>Discount Rate</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var customer in Model.Customers)
-                {
-                    <tr>
-                        <td>@Html.ActionLink(customer.Name, "Details", "Customers", new { id = customer.Id }, null)</td>
-                        <td>@customer.MemberShipType.Name</td>
-                        <td>@customer.MemberShipType.Discount%</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
+        <tr>
+            <td>@Html.ActionLink(customer.Name, "Edit", "Customers", new { id = customer.Id }, null)</td>
+            <td>@customer.MemberShipType.Name</td>
+            <td>@customer.MemberShipType.Discount%</td>
+            <td>
+                <button customer-id="@customer.Id" class="btn-link js-delete">Delete</button>
+            </td>
+        </tr>
+    }*@
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            var table = $("#Customers").DataTable({
+                ajax: {
+                    url: "/api/customers/all",
+                    dataSrc: ""
+                },
+                columns: [
+                    {
+                        data: "name",
+                        render: function (data, type, customer) {
+                            return "<a href='/customers/Edit/" + customer.id + "'>" + customer.name + "</a>";
+                        }
+                    },
+                    {
+                        data: "memberShipType.name"
+                    },
+                    {
+                        data: "memberShipType.discount"
+                    },
+                    {
+                        data: "id",
+                        render: function (data) {
+                            return "<button customer-id='" + data + "' class='btn-link js-delete'>Delete</button>";
+                        }
+                    }
+                ]
+            });
+            $("#Customers").on("click", ".js-delete", function () {
+                /* we used the table to minimize the memory because if we used the js-delete class
+                then for every row in the table there will be a handler for this row separately so by this we put just one handler
+                on the table by filter of the class name 'js-delete' */
+                var button = $(this);
+                bootbox.confirm({
+                    message: "Are you sure you want to delete this Customer?",
+                    buttons: {
+                        confirm: {
+                            label: 'Yes',
+                            className: 'btn-success'
+                        },
+                        cancel: {
+                            label: 'No',
+                            className: 'btn-danger'
+                        }
+                    },
+                    callback: function (result) {
+                        if (result) {
+                            $.ajax({
+                                url: "/api/customers/" + button.attr("customer-id"),
+                                method: "Delete",
+                                success: function () {
+                                    table.row(button.parents("tr")).remove().draw();
+                                    //button.parents("tr").remove();
+                                }
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 }

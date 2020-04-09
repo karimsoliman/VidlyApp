@@ -1,0 +1,57 @@
+﻿@model Vidly.ViewModels.CustomerFormVm
+@{
+    ViewBag.Title = "New";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div style="text-align:center">
+    <h2>New Customer</h2>
+    <br />
+</div>
+<div class="container center-block">
+    <div class="row">
+        <div class="col-sm-6 col-sm-offset-4 col-md-6 col-md-offset-4">
+            @using (Html.BeginForm("Save", "Customers"))
+            {
+                @Html.ValidationSummary(true, "Please insert the required fields.")
+                <div class="form-group row">
+                    @Html.LabelFor(m => m.Customer.Name, new { @class = "col-sm-3 col-form-label" })
+                    <div class="col-sm-9">
+                        @Html.TextBoxFor(m => m.Customer.Name, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Customer.Name)
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    @Html.LabelFor(m => m.Customer.Birthdate, new { @class = "col-sm-3 col-form-label" })
+                    <div class="col-sm-9">
+                        @Html.TextBoxFor(m => m.Customer.Birthdate, "{0: dd/MM/yyyy}", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Customer.Birthdate)
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    @Html.LabelFor(m => m.Customer.MemberShipTypeId, new { @class = "col-sm-3 col-form-label" })
+                    <div class="col-sm-9">
+                        @Html.DropDownListFor(m => m.Customer.MemberShipTypeId, new SelectList(Model.MembershipTypes, "Id", "Name"), "Memebership Type", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Customer.MemberShipTypeId)
+                    </div>
+                </div>
+
+                <div class="form-group form-check">
+                    @Html.CheckBoxFor(m => m.Customer.IsSubscribedToNewsLetter, new { @class = "form-check-input" })
+                    <label class="form-check-label" for="IsSubscribedForNewsLetter">Subscribed To NewsLetter</label>
+                </div>
+                @Html.HiddenFor(m => m.Customer.Id)
+                @Html.AntiForgeryToken()
+                <button class="btn btn-primary col-md-2 col-md-offset-3" type="submit">Submit</button>
+            }
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+}
+

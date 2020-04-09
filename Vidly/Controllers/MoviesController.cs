@@ -53,9 +53,53 @@ namespace Vidly.Controllers
         // GET: Movies?pageindex=1&sortby=size
         public ActionResult Index()
         {
-            var movies = _context.Movies.Include(m => m.Genre).ToList();
-            var moviesVm = new MoviesVm() { Movies = movies };
-            return View(moviesVm);
+            return View();
+        }
+
+        public ActionResult New()
+        {
+            var genres = _context.Genres.ToList();
+            var viewModel = new MovieFormVm() { Genres = genres};
+            return View("MovieForm", viewModel);
+        }
+
+        public ActionResult Edit(int id)
+        {
+            var genres = _context.Genres.ToList();
+            var movie = _context.Movies.FirstOrDefault(m => m.Id == id);
+            var viewModel = new MovieFormVm(movie) { Genres = genres };
+            return View("MovieForm", viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Save(Movie movie)
+        {
+            if (!ModelState.IsValid)
+            {
+                var viewModel = new MovieFormVm(movie)
+                {
+                    Genres = _context.Genres.ToList()
+                };
+
+                return View("MovieForm", viewModel);
+            }
+            if (movie.Id == 0)
+            {
+                movie.AddedDate = DateTime.Now;
+                _context.Movies.Add(movie);
+            }
+            else
+            {
+                var movieInDb = _context.Movies.FirstOrDefault(m => m.Id == movie.Id);
+                movieInDb.ReleaseDate = movie.ReleaseDate;
+                movieInDb.StockNumber = movie.StockNumber;
+                movieInDb.Name = movie.Name;
+                movieInDb.GenreId = movie.GenreId;
+            }
+                
+            _context.SaveChanges();
+            return RedirectToAction("Index", "Movies");
         }
 
         public ActionResult Details(int id)
